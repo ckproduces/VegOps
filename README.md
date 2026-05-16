@@ -1,4 +1,4 @@
-# VegaOps
+# VegOps
 
 Multi-agent incident response demo. A Next.js studio UI watches an in-process
 mock production target through a Python backend. When the mock target errors,
