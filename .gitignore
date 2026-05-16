@@ -1,0 +1,34 @@
+# OS/editor
+.DS_Store
+.idea/
+.vscode/
+
+# Secrets and local config
+.env
+.env.*
+!.env.example
+
+# JavaScript
+node_modules/
+.next/
+out/
+coverage/
+npm-debug.log*
+
+# Python
+.venv/
+venv/
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.mypy_cache/
+
+# Runtime state
+*.db
+*.db-*
+
+# Build artifacts
+dist/
+build/
+.cache/
+.tmp/

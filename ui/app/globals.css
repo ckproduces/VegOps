@@ -1,0 +1,40 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --bg: #ffffff;
+  --fg: #0a0a0a;
+  --muted: #71717a;
+  --border: #ececec;
+  --surface: #fafafa;
+  --hover: #f4f4f5;
+  --accent: #18181b;
+  --ok: #16a34a;
+  --warn: #d97706;
+  --err: #dc2626;
+}
+
+html, body {
+  background: var(--bg);
+  color: var(--fg);
+  font-weight: 400;
+  -webkit-font-smoothing: antialiased;
+}
+
+* { font-weight: 400; }
+.font-semibold, h1, h2, h3, h4, .semibold { font-weight: 600 !important; }
+
+.soft-border { border: 1px solid var(--border); }
+.soft-card { background: #fff; border: 1px solid var(--border); border-radius: 12px; }
+.muted { color: var(--muted); }
+
+button, [role="button"] { transition: all 150ms ease; }
+.scrollbar-thin::-webkit-scrollbar { width: 6px; height: 6px; }
+.scrollbar-thin::-webkit-scrollbar-thumb { background: #e4e4e7; border-radius: 999px; }
+
+@keyframes pulse-dot {
+  0%, 100% { opacity: 0.5; transform: scale(0.85); }
+  50% { opacity: 1; transform: scale(1); }
+}
+.pulse-dot { animation: pulse-dot 1.4s ease-in-out infinite; }
