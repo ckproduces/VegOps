@@ -1,6 +1,6 @@
-# VegaOps
+# VegOps
 
-VegaOps, SRE olay müdahalesini çok ajanlı bir akışla yöneten yerel bir
+VegOps, SRE olay müdahalesini çok ajanlı bir akışla yöneten yerel bir
 uygulamadır. Next.js arayüzü, FastAPI backend üzerinden bir hedef servisin
 sağlığını izler. Hedef servis 5xx durumuna geçtiğinde sistem otomatik olarak
 olay kaydı açar, Rick ve Morty teknik değerlendirme yapar, Darwin tek bir
