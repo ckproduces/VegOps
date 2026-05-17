@@ -25,7 +25,7 @@ export default function Sidebar() {
     >
       <div className="flex items-center gap-2 px-4 py-5">
         <Activity className="w-5 h-5" strokeWidth={1.75} />
-        {!collapsed && <span className="font-semibold tracking-tight">VegaOps</span>}
+        {!collapsed && <span className="font-semibold tracking-tight">VegOps</span>}
       </div>
       <nav className="flex flex-col gap-0.5 px-2">
         {items.map((it) => {

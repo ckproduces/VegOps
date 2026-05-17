@@ -5,7 +5,7 @@ import Sidebar from "@/components/Sidebar";
 import Navbar from "@/components/Navbar";
 
 export const metadata: Metadata = {
-  title: "VegaOps",
+  title: "VegOps",
   description: "Multi-agent SRE incident response",
 };
 
