@@ -11,6 +11,31 @@ araç çalıştırma, yeniden sağlık kontrolü ve olay sonrası raporlama adı
 uçtan uca göstermektir. Backend, ajan çağrılarını fal.ai OpenRouter uyumluluk
 katmanı üzerinden yapar ve OpenAI chat-completions şemasını kullanır.
 
+## Ekip
+
+Ekibimiz: Vega
+
+1. Çağrı Okan
+2. Ali Hakan Ünal
+3. Osman Selim Ilıca
+4. Ata Baş
+5. Abdurrahman Dıraz
+
+## Repository İçeriği
+
+Repository mutlaka şunları içermelidir:
+
+- Tüm kaynak kodu
+- Kapsamlı README
+- Proje açıklaması ve amacı
+- Kurulum talimatları
+- Kullanım kılavuzu
+- Kullanılan teknolojiler
+- Ekip üyeleri
+- Gerekli config dosyaları
+- Örnek `.env` şablonu
+- Gerçek API anahtarlarının repo'ya eklenmemiş olması
+
 Ayrıntılı ajan davranışı için [AGENTS.md](AGENTS.md), teknik tasarım için
 [DESIGN.md](DESIGN.md) dosyasına bakın.
 
@@ -87,60 +112,102 @@ Olay döngüsünün ana kodu `orchestrator/incident.py` dosyasındadır. Sağlı
 kontrolünü başlatan poller `orchestrator/poller.py` içindedir. Hedef servis
 durumu `orchestrator/target_state.py` tarafından yönetilir.
 
-## Yerel Çalıştırma
+## Ön Gereksinimler
 
-Repo kökünde `.env` dosyası oluşturun:
+- Git
+- Python 3.10 veya üzeri
+- Node.js 18.17 veya üzeri
+- npm
+- Geçerli bir fal.ai API anahtarı
+- Boşta olan `3000` ve `3001` portları
+
+## Yerel Kurulum ve Çalıştırma
+
+Repoyu klonlayın ve proje dizinine girin:
 
 ```bash
-FAL_KEY=...
+git clone <repo-url>
+cd turksat-hackathon
 ```
 
-İki terminal kullanın.
+Örnek ortam dosyasını kopyalayın:
+
+```bash
+cp .env.example .env
+```
+
+`.env` dosyasını açın ve gerçek `FAL_KEY` değerini girin:
+
+```bash
+FAL_KEY=your_fal_key_here
+```
+
+Gerçek API anahtarlarını `.env.example` içine yazmayın. `.env` dosyası
+`.gitignore` tarafından dışarıda bırakılır ve repoya eklenmemelidir.
+
+Backend'i başlatın:
 
 ```bash
 # Terminal 1 - backend (port 3001)
 cd orchestrator
 python3 -m venv .venv
-.venv/bin/pip install -r requirements.txt
-.venv/bin/uvicorn main:app --port 3001
+source .venv/bin/activate
+python -m pip install --upgrade pip
+python -m pip install -r requirements.txt
+python -m uvicorn main:app --host 0.0.0.0 --port 3001
 ```
+
+Yeni bir terminal açın ve UI'ı başlatın:
 
 ```bash
 # Terminal 2 - UI (port 3000)
 cd ui
-npm install
+npm ci
 npm run dev
 ```
 
-Arayüzü açın:
+Tarayıcıda arayüzü açın:
 
 ```text
 http://localhost:3000
 ```
 
-## Hızlı Kontroller
+## Kurulum Doğrulama
 
-Backend sağlık özetini alın:
+Backend çalışıyor mu kontrol edin:
 
 ```bash
-curl localhost:3001/api/health-target
+curl http://localhost:3001/api/health-target
 ```
 
 Hedef servis durumunu kontrol edin:
 
 ```bash
-curl localhost:3001/target/health
-curl localhost:3001/target/_debug/state
+curl http://localhost:3001/target/health
+curl http://localhost:3001/target/_debug/state
 ```
 
-Yerel test için hata oluşturun:
+UI üzerinden backend erişimini kontrol etmek için `http://localhost:3000`
+adresini açın. Dashboard hedef servis durumunu göstermelidir.
+
+Yerel olay akışını test etmek için hata oluşturun:
 
 ```bash
-curl -X POST localhost:3001/target/_debug/force-error
+curl -X POST http://localhost:3001/target/_debug/force-error
 ```
 
 Bu istekten sonra arayüzde yeni olay açılmalı, ajan mesajları akmalı ve seçilen
 araç onay eşiğine göre otomatik ya da kullanıcı onayıyla çalışmalıdır.
+
+## Kullanım Kılavuzu
+
+1. Dashboard sayfasında hedef servis sağlık durumunu izleyin.
+2. Hata oluştuğunda sistem otomatik olay sohbeti açar.
+3. Chats sayfasında Rick, Morty ve Darwin mesajlarını canlı takip edin.
+4. Darwin'in seçtiği araç onay eşiğini aşıyorsa Approve veya Deny seçin.
+5. Olay kapandıktan sonra Reports sayfasında ekip raporlarını inceleyin.
+6. Logs sayfasında olay ve araç geçmişini kontrol edin.
+7. Settings sayfasında sağlık endpoint'i ve onay seviyesini değiştirin.
 
 ## Dağıtım
 
@@ -194,7 +261,8 @@ docker run -p 3000:3000 -e PORT=3000 vegaops-ui
 
 ```text
 turksat-hackathon/
-├── .env                 # FAL_KEY
+├── .env.example         # örnek ortam değişkenleri, gerçek anahtar içermez
+├── .env                 # yerel ortam dosyası, repoya eklenmez
 ├── AGENTS.md            # ajan rolleri, modeller, araç seviyeleri
 ├── DESIGN.md            # teknik tasarım notları
 ├── orchestrator/        # FastAPI backend, ajan runtime, poller, SSE, SQLite

@@ -32,3 +32,6 @@ dist/
 build/
 .cache/
 .tmp/
+
+# AI
+.claude
