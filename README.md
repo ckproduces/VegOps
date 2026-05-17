@@ -90,7 +90,7 @@ Araçlar etki alanına göre sıralanır. Kullanıcının ayarladığı onay eş
 |---:|---|---|---|
 | 0 | `page_devops` | `POST /target/_control/page` | DevOps sayfası kaydeder; hata açık kalır |
 | 1 | `restart_server` | `POST /target/_control/restart` | Aktif hatayı temizler; backend sürecini yeniden başlatmaz |
-| 2 | `patch_code` | `POST /target/_control/patch` | Hedefi yamalanmış moda alır, hatayı temizler, sonraki hata aralığını uzatır |
+| 2 | `patch_code` | `POST /target/_control/patch` | Hedefi yamalanmış moda alır, hatayı temizler, ortalama hata aralığını 10 saniyede tutar |
 
 Araç tanımları `orchestrator/agents/tools.py` dosyasındadır.
 

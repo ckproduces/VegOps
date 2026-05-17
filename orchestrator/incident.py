@@ -60,6 +60,12 @@ async def _publish_agent_message(chat_id: int, agent: str, content: str) -> None
     """Publish and persist a complete agent message that was generated silently."""
     final = content.strip()
     await publish(chat_id, {"type": "message_start", "agent": agent})
+    await _finish_agent_message(chat_id, agent, final)
+
+
+async def _finish_agent_message(chat_id: int, agent: str, content: str) -> None:
+    """Publish and persist a complete agent message after message_start was already emitted."""
+    final = content.strip()
     if final:
         await publish(chat_id, {"type": "message_delta", "agent": agent, "delta": final})
     message_id = db.add_message(chat_id, role="agent", content=final, agent=agent)
@@ -267,6 +273,7 @@ class IncidentRunner:
                     "Choose exactly one tool. Reply with JSON only."
                 ),
             }]
+            await publish(self.chat_id, {"type": "message_start", "agent": "darwin"})
             darwin_raw = await complete(MODELS["darwin"], prompts.DARWIN_SYS, darwin_ctx)
             review_failed = False
             try:
@@ -283,6 +290,7 @@ class IncidentRunner:
                     self.incident_id,
                 )
                 await publish_global({"type": "data_changed", "scope": "logs"})
+                await publish(self.chat_id, {"type": "message_cancel", "agent": "darwin"})
                 continue
 
             db.add_log(
@@ -291,7 +299,7 @@ class IncidentRunner:
                 self.incident_id,
             )
             await publish_global({"type": "data_changed", "scope": "logs"})
-            await _publish_agent_message(self.chat_id, "darwin", darwin_raw)
+            await _finish_agent_message(self.chat_id, "darwin", darwin_raw)
             decision = _parse_darwin(darwin_raw)
             if not decision:
                 # fallback: escalate by attempt

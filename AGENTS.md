@@ -41,7 +41,7 @@ live under `/api/*`; mock target APIs live under `/target/*`.
 |------|------------------|------------------------------------|---------------------------------------------|
 | 0    | `page_devops`    | `POST /target/_control/page`       | Records the page; **error persists**.       |
 | 1    | `restart_server` | `POST /target/_control/restart`    | Mock restart; clears error without restarting the backend. |
-| 2    | `patch_code`     | `POST /target/_control/patch`      | Switches to patched mode, clears error, next-error mean → 80s. |
+| 2    | `patch_code`     | `POST /target/_control/patch`      | Switches to patched mode, clears error, next-error mean → 10s. |
 
 Defined in [orchestrator/agents/tools.py](orchestrator/agents/tools.py).
 

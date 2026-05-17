@@ -13,20 +13,22 @@ ERROR_MESSAGES = [
     "TLS handshake failed: certificate expired",
 ]
 
+ERROR_MEAN_INTERVAL_SECONDS = 10.0
+
 
 @dataclass
 class TargetState:
     error: bool = False
-    mean_interval: float = 40.0
+    mean_interval: float = ERROR_MEAN_INTERVAL_SECONDS
     mode: str = "normal"
     last_error_message: str = ""
-    next_error_at: float = field(default_factory=lambda: time.time() + 5.0)
+    next_error_at: float = field(default_factory=lambda: time.time() + ERROR_MEAN_INTERVAL_SECONDS)
     events: list = field(default_factory=list)
     timer_paused: bool = False
 
     def reset(self):
         self.error = False
-        self.mean_interval = 40.0
+        self.mean_interval = ERROR_MEAN_INTERVAL_SECONDS
         self.mode = "normal"
         self.last_error_message = ""
         self.events.clear()
@@ -98,7 +100,7 @@ def control_restart() -> dict:
 
 def control_patch() -> dict:
     state.mode = "patched"
-    state.mean_interval = 80.0
+    state.mean_interval = ERROR_MEAN_INTERVAL_SECONDS
     state.clear_error("patch_applied")
     if not state.timer_paused:
         state.schedule_next()

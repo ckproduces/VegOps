@@ -24,7 +24,7 @@ The mock target lives in the backend process in
 - `POST /target/_control/restart` is a mock restart. It clears the error
   without restarting or stopping the backend process.
 - `POST /target/_control/patch` clears the error, switches mode to `patched`,
-  and lengthens the next-error interval.
+  and keeps the next-error mean interval at 10 seconds.
 - `POST /target/_debug/force-error` forces an error for local smoke tests.
 
 ## Backend

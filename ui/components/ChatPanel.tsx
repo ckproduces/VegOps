@@ -108,8 +108,17 @@ export default function ChatPanel({ chatId }: { chatId: number }) {
         setConnected(false);
         return;
       }
+      if (ev.type === "heartbeat") {
+        return;
+      }
       if (ev.type === "message_start") {
         setStreamingAgent(ev.agent);
+        setStreamBuf("");
+        setThinking(null);
+        return;
+      }
+      if (ev.type === "message_cancel") {
+        setStreamingAgent(null);
         setStreamBuf("");
         setThinking(null);
         return;

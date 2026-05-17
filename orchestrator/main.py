@@ -259,7 +259,10 @@ async def chat_stream(chat_id: int):
         try:
             yield {"event": "open", "data": json.dumps({"chat_id": chat_id})}
             while True:
-                ev = await q.get()
+                try:
+                    ev = await asyncio.wait_for(q.get(), timeout=10.0)
+                except asyncio.TimeoutError:
+                    ev = {"type": "heartbeat"}
                 yield {"event": "message", "data": json.dumps(ev)}
         finally:
             unsubscribe(chat_id, q)
@@ -275,7 +278,10 @@ async def global_stream():
         try:
             yield {"event": "open", "data": "{}"}
             while True:
-                ev = await q.get()
+                try:
+                    ev = await asyncio.wait_for(q.get(), timeout=10.0)
+                except asyncio.TimeoutError:
+                    ev = {"type": "heartbeat"}
                 yield {"event": "message", "data": json.dumps(ev)}
         finally:
             unsubscribe_global(q)

@@ -3,9 +3,10 @@ const STREAM_BASE_ENV = process.env.NEXT_PUBLIC_ORCH_STREAM_BASE;
 
 function streamBase(): string {
   if (STREAM_BASE_ENV) return STREAM_BASE_ENV.replace(/\/$/, "");
-  if (typeof window !== "undefined" && BASE.startsWith("/")) {
-    const localHost = ["localhost", "127.0.0.1", "::1"].includes(window.location.hostname);
-    if (localHost) return `${window.location.protocol}//${window.location.hostname}:3001/api`;
+  if (typeof window !== "undefined" && BASE.startsWith("/") && window.location.protocol === "http:") {
+    const hostname = window.location.hostname === "0.0.0.0" ? "localhost" : window.location.hostname;
+    const host = hostname.includes(":") ? `[${hostname}]` : hostname;
+    return `${window.location.protocol}//${host}:3001/api`;
   }
   return BASE;
 }
@@ -102,22 +103,57 @@ export const api = {
   listReports: () => j<IncidentReport[]>(`${BASE}/reports`),
 };
 
-export function streamChat(chatId: number, onEvent: (ev: any) => void): () => void {
-  const es = new EventSource(`${streamBase()}/chats/${chatId}/stream`);
-  es.onopen = () => onEvent({ type: "stream_open" });
-  es.onmessage = (e) => {
-    try { onEvent(JSON.parse(e.data)); } catch {}
+function openStream(url: string, onEvent: (ev: any) => void): () => void {
+  let closed = false;
+  let connected = false;
+  let errorTimer: ReturnType<typeof setTimeout> | null = null;
+  const es = new EventSource(url);
+  const markOpen = () => {
+    if (closed) return;
+    if (errorTimer) {
+      clearTimeout(errorTimer);
+      errorTimer = null;
+    }
+    if (!connected) {
+      connected = true;
+      onEvent({ type: "stream_open" });
+    }
   };
-  es.onerror = () => { onEvent({ type: "stream_error" }); };
-  return () => es.close();
+  es.onopen = () => {
+    markOpen();
+  };
+  es.onmessage = (e) => {
+    if (closed) return;
+    try {
+      markOpen();
+      onEvent(JSON.parse(e.data));
+    } catch {}
+  };
+  es.onerror = () => {
+    if (closed || errorTimer) return;
+    errorTimer = setTimeout(() => {
+      if (!closed) {
+        connected = false;
+        onEvent({ type: "stream_error" });
+      }
+    }, 3000);
+  };
+  return () => {
+    closed = true;
+    if (errorTimer) clearTimeout(errorTimer);
+    es.onopen = null;
+    es.onmessage = null;
+    es.onerror = null;
+    es.close();
+  };
+}
+
+export function streamChat(chatId: number, onEvent: (ev: any) => void): () => void {
+  return openStream(`${streamBase()}/chats/${chatId}/stream`, onEvent);
 }
 
 export function streamGlobal(onEvent: (ev: any) => void): () => void {
-  const es = new EventSource(`${streamBase()}/stream`);
-  es.onopen = () => onEvent({ type: "stream_open" });
-  es.onmessage = (e) => { try { onEvent(JSON.parse(e.data)); } catch {} };
-  es.onerror = () => { onEvent({ type: "stream_error" }); };
-  return () => es.close();
+  return openStream(`${streamBase()}/stream`, onEvent);
 }
 
 export const TOOL_LABELS: Record<string, string> = {
